@@ -74,23 +74,6 @@ static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p1[] = {
 	{ 0 }
 };
 
-#ifdef CONFIG_USERSPACE_VOLTAGE_CONTROL
-static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p2[] = {
-	{ 1,  96000,  PLL0,    4, 2,   1140000,    1140000, 2 },
-	{ 1,  192000, ACPUPLL, 5, 2,   1140000,    1140000, 3 },
-	{ 1,  259000, ACPUPLL, 4, 2,   1140000,    1140000, 4 },
-	{ 1,  300000, PLL0,    4, 2,   1140000,    1140000, 4 },
-	{ 1,  384000, ACPUPLL, 5, 2,   1140000,    1140000, 4 },
-	{ 1,  600000, PLL0,    4, 0,   1150000,    1150000, 6 },
-	{ 1,  787200, ACPUPLL, 5, 0,   1150000,    1150000, 6 },
-	{ 1,  998400, ACPUPLL, 5, 0,   1280000,    1280000, 7 },
-	{ 1, 1094400, ACPUPLL, 5, 0,   1280000,    1280000, 7 },
-	{ 1, 1190400, ACPUPLL, 5, 0,   1280000,    1280000, 7 },
-	{ 0 }
-};
-
-#else
-
 static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p2[] = {
 	{ 1,  96000,  PLL0,    4, 2,   CPR_CORNER_2,    0, 2 },
 	{ 1,  192000, ACPUPLL, 5, 2,   CPR_CORNER_2,    0, 3 },
@@ -104,8 +87,6 @@ static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p2[] = {
 	{ 1, 1190400, ACPUPLL, 5, 0,   CPR_CORNER_12,  0, 7 },
 	{ 0 }
 };
-
-#endif
 
 static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p4[] = {
 	{ 1,  96000,  PLL0,    4, 2,   CPR_CORNER_2,    0, 2 },
@@ -167,11 +148,7 @@ static struct acpuclk_drv_data drv_data = {
 	.freq_tbl = acpu_freq_tbl_8226_1p1,
 	.pvs_tables = pvs_tables_8226,
 	.bus_scale = &bus_client_pdata,
-#ifdef CONFIG_USERSPACE_VOLTAGE_CONTROL
-	.vdd_max_cpu = 1280000,
-#else
- 	.vdd_max_cpu = CPR_CORNER_12,
-#endif
+	.vdd_max_cpu = CPR_CORNER_12,
 	.src_clocks = {
 		[PLL0].name = "gpll0",
 		[ACPUPLL].name = "a7sspll",
