@@ -331,68 +331,53 @@ static unsigned long acpuclk_cortex_get_rate(int cpu)
 	return priv->current_speed->khz;
 }
 
-#ifdef CONFIG_USERSPACE_VOLTAGE_CONTROL
+#ifdef CONFIG_CPU_VOLTAGE_TABLE
 
-#define MAX_VDD_CPU 1300
-#define MIN_VDD_CPU 800
+#define HFPLL_MIN_VDD		 800000
+#define HFPLL_MAX_VDD		1350000
 
-int get_num_freqs(void)
-{
-	int i;
-	int count = 0;
-
-	for (i = 0; priv->freq_tbl[i].use_for_scaling; i++)
-		count++;
-
-	return count;
-}
-
-ssize_t acpuclk_get_vdd_levels_str(char *buf)
-{
+ssize_t acpuclk_get_vdd_levels_str(char *buf) {
 
 	int i, len = 0;
 
 	if (buf) {
+		mutex_lock(&priv->lock);
+
 		for (i = 0; priv->freq_tbl[i].khz; i++) {
-			if (priv->freq_tbl[i].use_for_scaling) {
-				len += sprintf(buf + len, "%umhz: %i mV\n", priv->freq_tbl[i].khz/1000,
-					priv->freq_tbl[i].vdd_cpu/1000);
-			}
+			/* updated to use uv required by 8x60 architecture - faux123 */
+			len += sprintf(buf + len, "%8lu: %8d\n", priv->freq_tbl[i].khz,
+				priv->freq_tbl[i].vdd_cpu );
 		}
+
+		mutex_unlock(&priv->lock);
 	}
 	return len;
 }
 
-ssize_t acpuclk_set_vdd(char *buf)
-{
-	unsigned int cur_volt;
-	char size_cur[get_num_freqs()];
+/* updated to use uv required by 8x60 architecture - faux123 */
+void acpuclk_set_vdd(unsigned int khz, int vdd_uv) {
+
 	int i;
-	int ret = 0;
+	unsigned int new_vdd_uv;
 
-	if (buf) {
-		for (i = 0; priv->freq_tbl[i].use_for_scaling; i++) {
-			ret = sscanf(buf, "%d", &cur_volt);
+	mutex_lock(&priv->lock);
 
-			if (ret != 1)
-				return -EINVAL;
+	for (i = 0; priv->freq_tbl[i].khz; i++) {
+		if (khz == 0)
+			new_vdd_uv = min(max((unsigned int)(priv->freq_tbl[i].vdd_cpu + vdd_uv),
+				(unsigned int)HFPLL_MIN_VDD), (unsigned int)HFPLL_MAX_VDD);
+		else if ( priv->freq_tbl[i].khz == khz)
+			new_vdd_uv = min(max((unsigned int)vdd_uv,
+				(unsigned int)HFPLL_MIN_VDD), (unsigned int)HFPLL_MAX_VDD);
+		else 
+			continue;
 
-			if (cur_volt > MAX_VDD_CPU || cur_volt < MIN_VDD_CPU) {
-				printk("Voltage Control: You have set a voltage which is out of range: %i mV !\n", cur_volt);
-				return -EINVAL;
-			}
-
-			priv->freq_tbl[i].vdd_cpu = cur_volt*1000;
-
-			ret = sscanf(buf, "%s", size_cur);
-			buf += (strlen(size_cur)+1);
-		}
+		priv->freq_tbl[i].vdd_cpu = new_vdd_uv;
 	}
-	return ret;
+	pr_warn("faux123: user voltage table modified!\n");
+	mutex_unlock(&priv->lock);
 }
-
-#endif
-
+#endif	/* CONFIG_CPU_VOTALGE_TABLE */
 
 #ifdef CONFIG_CPU_FREQ_MSM
 static struct cpufreq_frequency_table freq_table[30];
