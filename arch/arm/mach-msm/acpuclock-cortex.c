@@ -457,7 +457,7 @@ static struct clkctl_acpu_speed *__init select_freq_plan(void)
 	if (bin.speed_valid) {
 		pr_info("SPEED BIN: %d\n", bin.speed);
 	} else {
-		bin.speed = 1;
+		bin.speed = 0;
 		pr_warn("SPEED BIN: Defaulting to %d\n",
 			 bin.speed);
 	}
