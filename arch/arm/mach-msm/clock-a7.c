@@ -215,20 +215,20 @@ static void get_speed_bin(struct platform_device *pdev, int *bin, int *version)
 	void __iomem *base;
 	u32 pte_efuse, redundant_sel, valid;
 
-	*bin = 0;
+	*bin = 1;
 	*version = 0;
 
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "efuse");
 	if (!res) {
 		dev_info(&pdev->dev,
-			 "No speed/PVS binning available. Defaulting to 0!\n");
+			 "No speed/PVS binning available. Defaulting to 1!\n");
 		return;
 	}
 
 	base = devm_ioremap(&pdev->dev, res->start, resource_size(res));
 	if (!base) {
 		dev_warn(&pdev->dev,
-			 "Unable to read efuse data. Defaulting to 0!\n");
+			 "Unable to read efuse data. Defaulting to 1!\n");
 		return;
 	}
 
@@ -245,7 +245,7 @@ static void get_speed_bin(struct platform_device *pdev, int *bin, int *version)
 
 	if (!valid) {
 		dev_info(&pdev->dev, "Speed bin not set. Defaulting to 0!\n");
-		*bin = 0;
+		*bin = 1;
 	} else {
 		dev_info(&pdev->dev, "Speed bin: %d\n", *bin);
 	}
@@ -292,7 +292,7 @@ static int of_get_clk_src(struct platform_device *pdev, struct clk_src *parents)
 static int clock_a7_probe(struct platform_device *pdev)
 {
 	struct resource *res;
-	int speed_bin = 0, version = 0, rc;
+	int speed_bin = 1, version = 0, rc;
 	unsigned long rate, aux_rate;
 	struct clk *aux_clk, *main_pll;
 	char prop_name[] = "qcom,speedX-bin-vX";
