@@ -391,9 +391,13 @@ static struct clkctl_acpu_speed *__init select_freq_plan(void)
 
 	get_speed_bin(priv->pte_efuse_base, &bin);
 
-		bin.speed = 2;
+	if (bin.speed_valid) {
+		pr_info("SPEED BIN: %d\n", bin.speed);
+	} else {
+		bin.speed = 0;
 		pr_warn("SPEED BIN: Defaulting to %d\n",
 			 bin.speed);
+	}
 
 	return priv->pvs_tables[bin.speed];
 }
