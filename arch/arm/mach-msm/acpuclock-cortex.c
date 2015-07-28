@@ -40,6 +40,7 @@
 #define POLL_INTERVAL_US		1
 #define APCS_RCG_UPDATE_TIMEOUT_US	20
 
+static DEFINE_MUTEX(driver_lock);
 static struct acpuclk_drv_data *priv;
 static uint32_t bus_perf_client;
 
@@ -330,6 +331,54 @@ static unsigned long acpuclk_cortex_get_rate(int cpu)
 {
 	return priv->current_speed->khz;
 }
+
+#ifdef CONFIG_CPU_VOLTAGE_TABLE
+
+#define HFPLL_MIN_VDD		 700000
+#define HFPLL_MAX_VDD		1300000
+
+ssize_t acpuclk_get_vdd_levels_str(char *buf) {
+
+	int i, len = 0;
+
+	if (buf) {
+		mutex_lock(&driver_lock);
+
+		for (i = 0;  priv->freq_tbl[i].khz; i++) {
+			/* updated to use uv required by 8x60 architecture - faux123 */
+			len += sprintf(buf + len, "%8lu: %8d\n", priv->freq_tbl[i].khz,
+				priv->freq_tbl[i].vdd_cpu );
+		}
+
+		mutex_unlock(&driver_lock);
+	}
+	return len;
+}
+
+/* updated to use uv required by 8x60 architecture - faux123 */
+void acpuclk_set_vdd(unsigned int khz, int vdd_uv) {
+
+	int i;
+	unsigned int new_vdd_uv;
+
+	mutex_lock(&driver_lock);
+
+	for (i = 0; priv->freq_tbl[i].khz; i++) {
+		if (khz == 0)
+			new_vdd_uv = min(max((unsigned int)(priv->freq_tbl[i].vdd_cpu + vdd_uv),
+				(unsigned int)HFPLL_MIN_VDD), (unsigned int)HFPLL_MAX_VDD);
+		else if ( priv->freq_tbl[i].khz == khz)
+			new_vdd_uv = min(max((unsigned int)vdd_uv,
+				(unsigned int)HFPLL_MIN_VDD), (unsigned int)HFPLL_MAX_VDD);
+		else 
+			continue;
+
+		priv->freq_tbl->vdd_cpu = new_vdd_uv;
+	}
+	pr_warn("faux123: user voltage table modified!\n");
+	mutex_unlock(&driver_lock);
+}
+#endif	/* CONFIG_CPU_VOTALGE_TABLE */
 
 #ifdef CONFIG_CPU_FREQ_MSM
 static struct cpufreq_frequency_table freq_table[30];
