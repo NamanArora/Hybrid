@@ -400,6 +400,9 @@ extern struct cpufreq_governor cpufreq_gov_alucard;
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIACTIVE)
 extern struct cpufreq_governor cpufreq_gov_intelliactive;
 #define CPUFREQ_DEFAULT_GOVERNOR        (&cpufreq_gov_intelliactive)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_HYBRID)
+extern struct cpufreq_governor cpufreq_gov_hybrid;
+#define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_hybrid)
 #endif
 
 
