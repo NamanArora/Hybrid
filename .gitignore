@@ -171,4 +171,5 @@ drivers/staging/prima/wlan.ko
 drivers/staging/prima/wlan.mod.c
 boot.img
 setup/dt.img
+arch/arm/boot/compressed/*
 
