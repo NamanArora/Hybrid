@@ -59,6 +59,85 @@ static struct msm_bus_scale_pdata bus_client_pdata = {
 	.name = "acpuclock",
 };
 
+#ifdef CONFIG_USERSPACE_VOLTAGE_CONTROL /* voltage tale for vltage control */
+
+static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p1[] = {
+	{ 1,  96000,  PLL0,    4, 2,   1140000,  1140000, 2 },
+	{ 1,  192000, ACPUPLL, 5, 2,   1140000,  1140000, 3 },
+	{ 1,  259000, ACPUPLL, 4, 2,   1140000,  1140000, 4 },
+	{ 1,  300000, PLL0,    4, 2,   1140000,  1140000, 4 },
+	{ 1,  384000, ACPUPLL, 5, 2,   1140000,  1140000, 4 },
+	{ 1,  499000, ACPUPLL, 5, 2,   1140000,  1140000, 4 },
+	{ 1,  600000, PLL0,    4, 0,   1150000,  1150000, 6 },
+	{ 1,  787200, ACPUPLL, 5, 0,   1150000,  1150000, 6 },
+	{ 1,  998400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1094400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1190400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 0 }
+};
+
+static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p2[] = {
+	{ 1,  96000,  PLL0,    4, 2,   1140000,  1140000, 2 },
+	{ 1,  192000, ACPUPLL, 5, 2,   1140000,  1140000, 3 },
+	{ 1,  259000, ACPUPLL, 4, 2,   1140000,  1140000, 4 },
+	{ 1,  300000, PLL0,    4, 2,   1140000,  1140000, 4 },
+	{ 1,  384000, ACPUPLL, 5, 2,   1140000,  1140000, 4 },
+	{ 1,  600000, PLL0,    4, 0,   1150000,  1150000, 6 },
+	{ 1,  787200, ACPUPLL, 5, 0,   1150000,  1150000, 6 },
+	{ 1,  998400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1094400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1190400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 0 }
+};
+
+static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p4[] = {
+	{ 1,  96000,  PLL0,    4, 2,   1140000,  1140000, 2 },
+	{ 1,  192000, ACPUPLL, 5, 2,   1140000,  1140000, 3 },
+	{ 1,  259000, ACPUPLL, 4, 2,   1140000,  1140000, 4 },
+	{ 1,  300000, PLL0,    4, 2,   1140000,  1140000, 4 },
+	{ 1,  384000, ACPUPLL, 5, 2,   1140000,  1140000, 4 },
+	{ 1,  600000, PLL0,    4, 0,   1150000,  1150000, 6 },
+	{ 1,  787200, ACPUPLL, 5, 0,   1150000,  1150000, 6 },
+	{ 1,  998400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1094400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1190400, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1305600, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1344000, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 1, 1401600, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 0 }
+};
+
+static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p6[] = {
+	{ 1,  96000,  PLL0,    4, 2,   1140000,  1140000, 2 },
+	{ 1,  192000, ACPUPLL, 5, 2,   1140000,  1140000, 3 },
+	{ 1,  259000, ACPUPLL, 4, 2,   1140000,  1140000, 4 },
+	{ 1,  300000, PLL0,    4, 2,   1140000,  1140000, 4 },
+	{ 1,  384000, ACPUPLL, 5, 2,   1140000,  1140000, 4 },
+	{ 1,  600000, PLL0,    4, 0,   1150000,  1150000, 6 },
+	{ 1,  787200, ACPUPLL, 5, 0,   1150000,  1150000, 6 },
+	{ 1,  998400, ACPUPLL, 5, 0,   1175000,  1175000, 7 },
+	{ 1, 1094400, ACPUPLL, 5, 0,   1190000,  1190000, 7 },
+	{ 1, 1190400, ACPUPLL, 5, 0,   1200000,  1200000, 7 },
+	{ 1, 1305600, ACPUPLL, 5, 0,   1210000,  1210000, 7 },
+	{ 1, 1344000, ACPUPLL, 5, 0,   1225000,  1225000, 7 },
+	{ 1, 1401600, ACPUPLL, 5, 0,   1240000,  1240000, 7 },
+	{ 1, 1497600, ACPUPLL, 5, 0,   1265000,  1265000, 7 },
+	{ 1, 1593600, ACPUPLL, 5, 0,   1280000,  1280000, 7 },
+	{ 0 }
+};
+
+static struct clkctl_acpu_speed acpu_freq_tbl_8610[] = {
+	{ 1,  300000, PLL0,    4, 2,   1140000,  1140000, 3 },
+	{ 1,  384000, ACPUPLL, 5, 2,   1140000,  1140000, 3 },
+	{ 1,  600000, PLL0,    4, 0,   1150000,  1150000, 4 },
+	{ 1,  787200, ACPUPLL, 5, 0,   1150000,  1150000, 4 },
+	{ 1,  998400, ACPUPLL, 5, 0,   1280000,  1280000, 5 },
+	{ 1, 1190400, ACPUPLL, 5, 0,   1280000,  1280000, 5 },
+	{ 0 }
+};
+
+#else /* if voltage control is not used */
+
 static struct clkctl_acpu_speed acpu_freq_tbl_8226_1p1[] = {
 	{ 1,  96000,  PLL0,    4, 2,   CPR_CORNER_2,    0, 2 },
 	{ 1,  192000, ACPUPLL, 5, 2,   CPR_CORNER_2,    0, 3 },
@@ -134,21 +213,27 @@ static struct clkctl_acpu_speed acpu_freq_tbl_8610[] = {
 	{ 0 }
 };
 
+#endif /* voltage table */
+
 static struct clkctl_acpu_speed *pvs_tables_8226[NUM_SPEED_BIN] = {
-	[0] = acpu_freq_tbl_8226_1p4,
-	[6] = acpu_freq_tbl_8226_1p4,
-	[2] = acpu_freq_tbl_8226_1p4,
-	[5] = acpu_freq_tbl_8226_1p4,
+	[0] = acpu_freq_tbl_8226_1p2,
+	[6] = acpu_freq_tbl_8226_1p6,
+	[2] = acpu_freq_tbl_8226_1p2,
+	[5] = acpu_freq_tbl_8226_1p6,
 	[4] = acpu_freq_tbl_8226_1p4,
 	[7] = acpu_freq_tbl_8226_1p4,
-	[1] = acpu_freq_tbl_8226_1p4,
+	[1] = acpu_freq_tbl_8226_1p2,
 };
 
 static struct acpuclk_drv_data drv_data = {
-	.freq_tbl = acpu_freq_tbl_8226_1p4,
+	.freq_tbl = acpu_freq_tbl_8226_1p1,
 	.pvs_tables = pvs_tables_8226,
 	.bus_scale = &bus_client_pdata,
+#ifdef CONFIG_USERSPACE_VOLTAGE_CONTROL
+	.vdd_max_cpu = 1280000,
+#else
 	.vdd_max_cpu = CPR_CORNER_12,
+#endif
 	.src_clocks = {
 		[PLL0].name = "gpll0",
 		[ACPUPLL].name = "a7sspll",
