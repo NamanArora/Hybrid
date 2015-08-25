@@ -334,8 +334,8 @@ static unsigned long acpuclk_cortex_get_rate(int cpu)
 
 #ifdef CONFIG_CPU_VOLTAGE_TABLE
 
-#define HFPLL_MIN_VDD		 700000
-#define HFPLL_MAX_VDD		1300000
+#define HFPLL_MIN_VDD		1050000
+#define HFPLL_MAX_VDD		1275000
 
 ssize_t acpuclk_get_vdd_levels_str(char *buf) {
 
