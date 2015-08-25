@@ -1,3 +1,5 @@
+menu "HOT_PLUGS"
+
 config INTELLI_PLUG
         bool "Enable intelli-plug cpu hotplug driver"
         default n
@@ -9,3 +11,13 @@ config ALUCARD_HOTPLUG
         default n
         help
           Generic alucard_hotplug cpu hotplug driver for ARM SOCs
+
+config BRICKED_HOTPLUG
+	bool "Enable kernel based mpdecision"
+	depends on MSM_RUN_QUEUE_STATS
+	default y
+	help
+	  This enables kernel based multi core control.
+	  (up/down hotplug based on load)
+
+endmenu
