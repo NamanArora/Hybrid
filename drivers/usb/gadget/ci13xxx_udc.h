@@ -147,6 +147,10 @@ struct ci13xxx_udc_driver {
 #define CI13XXX_CONTROLLER_UDC_STARTED_EVENT		6
 
 	void	(*notify_event) (struct ci13xxx *udc, unsigned event);
+// [All][Main][Stability][DMS06176102][47114][akenhsu] Add QCT Patch of USB in case#01889416 20150130 BEGIN
+// https://www.codeaurora.org/cgit/quic/la/kernel/msm-3.10/patch/drivers/usb/gadget/ci13xxx_udc.h?id=6a70ad8cfe09e62352e9b78e7bfd7b160fce775f
+	bool    (*in_lpm) (struct ci13xxx *udc);
+// [All][Main][Stability][DMS06176102][47114][akenhsu] 20150130 END
 };
 
 /* CI13XXX UDC descriptor & global resources */

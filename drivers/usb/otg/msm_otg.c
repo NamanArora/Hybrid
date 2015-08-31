@@ -1156,6 +1156,12 @@ static int msm_otg_resume(struct msm_otg *motg)
 	u32 phy_ctrl_val = 0;
 	unsigned ret;
 	u32 func_ctrl;
+// [All][Main][Stability][DMS06176102][47114][akenhsu] Add QCT Patch of USB in case#01889416 20150130 BEGIN
+// https://www.codeaurora.org/cgit/quic/la/kernel/msm-3.10/patch/drivers/usb/gadget/ci13xxx_udc.h?id=6a70ad8cfe09e62352e9b78e7bfd7b160fce775f
+	bool in_device_mode;
+	bool bus_is_suspended;
+	bool is_remote_wakeup;
+// [All][Main][Stability][DMS06176102][47114][akenhsu] 20150130 END
 
 	if (!atomic_read(&motg->in_lpm))
 		return 0;
@@ -1223,12 +1229,47 @@ static int msm_otg_resume(struct msm_otg *motg)
 	 * PHY comes out of low power mode (LPM) in case of wakeup
 	 * from asynchronous interrupt.
 	 */
-	if (!(readl(USB_PORTSC) & PORTSC_PHCD))
+// [All][Main][Stability][DMS06176102][47114][akenhsu] Add QCT Patch of USB in case#01889416 20150130 BEGIN
+// https://www.codeaurora.org/cgit/quic/la/kernel/msm-3.10/patch/drivers/usb/gadget/ci13xxx_udc.h?id=6a70ad8cfe09e62352e9b78e7bfd7b160fce775f
+//	if (!(readl(USB_PORTSC) & PORTSC_PHCD))
+	if (!(readl_relaxed(USB_PORTSC) & PORTSC_PHCD))
+// [All][Main][Stability][DMS06176102][47114][akenhsu] 20150130 END
 		goto skip_phy_resume;
 
-	writel(readl(USB_PORTSC) & ~PORTSC_PHCD, USB_PORTSC);
+// [All][Main][Stability][DMS06176102][47114][akenhsu] Add QCT Patch of USB in case#01889416 20150130 BEGIN
+// https://www.codeaurora.org/cgit/quic/la/kernel/msm-3.10/patch/drivers/usb/gadget/ci13xxx_udc.h?id=6a70ad8cfe09e62352e9b78e7bfd7b160fce775f
+//	writel(readl(USB_PORTSC) & ~PORTSC_PHCD, USB_PORTSC);
+	in_device_mode =
+		phy->otg->gadget &&
+		test_bit(ID, &motg->inputs);
+
+	bus_is_suspended =
+		readl_relaxed(USB_PORTSC) & PORTSC_SUSP_MASK;
+
+	is_remote_wakeup = in_device_mode && bus_is_suspended;
+
+	if (is_remote_wakeup && pdata->rw_during_lpm_workaround) {
+		/*
+		 * In some targets there is a HW issue with remote wakeup
+		 * during low-power mode. As a workaround, the FPR bit
+		 * is written simultaneously with the clearing of the
+		 * PHCD bit.
+		 */
+		writel_relaxed(
+			(readl_relaxed(USB_PORTSC) & ~PORTSC_PHCD) |
+			PORTSC_FPR_MASK,
+			USB_PORTSC);
+	} else {
+		writel_relaxed(readl_relaxed(USB_PORTSC) & ~PORTSC_PHCD,
+			USB_PORTSC);
+	}
+// [All][Main][Stability][DMS06176102][47114][akenhsu] 20150130 END
 	while (cnt < PHY_RESUME_TIMEOUT_USEC) {
-		if (!(readl(USB_PORTSC) & PORTSC_PHCD))
+// [All][Main][Stability][DMS06176102][47114][akenhsu] Add QCT Patch of USB in case#01889416 20150130 BEGIN
+// https://www.codeaurora.org/cgit/quic/la/kernel/msm-3.10/patch/drivers/usb/gadget/ci13xxx_udc.h?id=6a70ad8cfe09e62352e9b78e7bfd7b160fce775f
+//		if (!(readl(USB_PORTSC) & PORTSC_PHCD))
+		if (!(readl_relaxed(USB_PORTSC) & PORTSC_PHCD))
+// [All][Main][Stability][DMS06176102][47114][akenhsu] 20150130 END
 			break;
 		udelay(1);
 		cnt++;
