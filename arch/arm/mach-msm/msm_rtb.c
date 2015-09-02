@@ -50,6 +50,9 @@ struct msm_rtb_layout {
 	void *caller;
 	unsigned long idx;
 	void *data;
+// [All][Main][Stability][DMS05406637][46841][akenhsu] Add timestamp to rtb logging for QCT trace issue 20141209 BEGIN
+//	uint64_t timestamp;
+// [All][Main][Stability][DMS05406637][46841][akenhsu] 20141209 END
 } __attribute__ ((__packed__));
 
 
@@ -125,6 +128,13 @@ static void msm_rtb_write_data(void *data, struct msm_rtb_layout *start)
 	start->data = data;
 }
 
+// [All][Main][Stability][DMS05406637][46841][akenhsu] Add timestamp to rtb logging for QCT trace issue 20141209 BEGIN
+//static void msm_rtb_write_timestamp(struct msm_rtb_layout *start)
+//{
+//	start->timestamp = sched_clock();
+//}
+// [All][Main][Stability][DMS05406637][46841][akenhsu] 20141209 END
+
 static void uncached_logk_pc_idx(enum logk_event_type log_type, void *caller,
 				 void *data, int idx)
 {
@@ -137,6 +147,9 @@ static void uncached_logk_pc_idx(enum logk_event_type log_type, void *caller,
 	msm_rtb_write_caller(caller, start);
 	msm_rtb_write_idx(idx, start);
 	msm_rtb_write_data(data, start);
+// [All][Main][Stability][DMS05406637][46841][akenhsu] Add timestamp to rtb logging for QCT trace issue 20141209 BEGIN
+//	msm_rtb_write_timestamp(start);
+// [All][Main][Stability][DMS05406637][46841][akenhsu] 20141209 END
 	mb();
 
 	return;
@@ -210,6 +223,11 @@ int notrace uncached_logk_pc(enum logk_event_type log_type, void *caller,
 
 	if (!msm_rtb_event_should_log(log_type))
 		return 0;
+
+// [All][Main][Stability][DMS05406637][46841][akenhsu] Add timestamp to rtb logging for QCT trace issue 20141209 BEGIN
+	i = msm_rtb_get_idx();
+	uncached_logk_timestamp(i);
+// [All][Main][Stability][DMS05406637][46841][akenhsu] 20141209 END
 
 	i = msm_rtb_get_idx();
 

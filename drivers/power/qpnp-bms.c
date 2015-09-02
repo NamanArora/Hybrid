@@ -1921,6 +1921,7 @@ static int report_cc_based_soc(struct qpnp_bms_chip *chip)
 	charging_since_last_report = charging || (chip->last_soc_unbound
 			&& chip->was_charging_at_sleep);
 
+/*[Arima5880][46993][bozhi_lin] battery level is show abnormal when battery voltage is low 20141217 begin*/
 /*[Arima5908][39939][bozhi_lin] implement battery capacity smooth mechanism for fine tune user feeling 20140620 begin*/
 #if ( (CONFIG_BSP_HW_V_CURRENT >= CONFIG_BSP_HW_V_8226DS_PDP2) && defined(CONFIG_BSP_HW_SKU_8226DS) \
    || (CONFIG_BSP_HW_V_CURRENT >= CONFIG_BSP_HW_V_8226SS_PDP2) && defined(CONFIG_BSP_HW_SKU_8226SS) \
@@ -1944,6 +1945,12 @@ static int report_cc_based_soc(struct qpnp_bms_chip *chip)
 			soc = chip->last_soc;
 		}
 	}
+
+	if (chip->last_is_charging ^ charging) {
+		get_current_time(&last_change_sec);
+		chip->last_soc_change_sec = last_change_sec;
+		calculate_delta_time(&last_change_sec, &time_since_last_change_sec);
+	}
 	
 	if (charging) {
 		chip->last_is_charging = true;
@@ -1953,6 +1960,7 @@ static int report_cc_based_soc(struct qpnp_bms_chip *chip)
 	}
 #endif
 /*[Arima5908][39939][bozhi_lin] 20140620 end  */
+/*[Arima5880][46993][bozhi_lin] 20141217 end*/
 			
 	/*
 	 * account for charge time - limit it to SOC_CATCHUP_SEC to
@@ -2016,20 +2024,36 @@ static int report_cc_based_soc(struct qpnp_bms_chip *chip)
 			soc_change = min(1, soc_change);
 		}
 
-		if (soc < chip->last_soc && soc != 0)
-			soc = chip->last_soc - soc_change;
+/*[Arima5880][46993][bozhi_lin] battery level is show abnormal when battery voltage is low 20141217 begin*/
 /*[Arima5908][39939][bozhi_lin] implement battery capacity smooth mechanism for fine tune user feeling 20140620 begin*/
 #if ( (CONFIG_BSP_HW_V_CURRENT >= CONFIG_BSP_HW_V_8226DS_PDP2) && defined(CONFIG_BSP_HW_SKU_8226DS) \
    || (CONFIG_BSP_HW_V_CURRENT >= CONFIG_BSP_HW_V_8226SS_PDP2) && defined(CONFIG_BSP_HW_SKU_8226SS) \
    || (CONFIG_BSP_HW_V_CURRENT >= CONFIG_BSP_HW_V_8926DS_PDP2) && defined(CONFIG_BSP_HW_SKU_8926DS) \
    || (CONFIG_BSP_HW_V_CURRENT >= CONFIG_BSP_HW_V_8926SS_PDP2) && defined(CONFIG_BSP_HW_SKU_8926SS) )
-		if (soc > chip->last_soc)
-			soc = chip->last_soc + soc_change;
+		if (soc < chip->last_soc) {
+			if (!charging) {
+				soc = chip->last_soc - soc_change;
+			}
+			else {
+				soc = chip->last_soc;
+			}
+		}
+		if (soc > chip->last_soc) {
+			if (charging) {
+				soc = chip->last_soc + soc_change;
+			}
+			else {
+				soc = chip->last_soc;
+			}
+		}
 #else			
+		if (soc < chip->last_soc && soc != 0)
+			soc = chip->last_soc - soc_change;
 		if (soc > chip->last_soc && soc != 100)
 			soc = chip->last_soc + soc_change;
 #endif
 /*[Arima5908][39939][bozhi_lin] 20140620 end  */
+/*[Arima5880][46993][bozhi_lin] 20141217 end*/
 
 /*[Arima5908][42699][bozhi_lin] set smooth time to 30 seconds when battery capacity is low 20140814 begin*/
 /*[Arima5908][39939][bozhi_lin] implement battery capacity smooth mechanism for fine tune user feeling 20140620 begin*/

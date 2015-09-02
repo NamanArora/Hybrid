@@ -76,7 +76,10 @@
 			<1050000 1050000 1140000>,
 			<1050000 1050000 1140000>;
 		qcom,cpr-voltage-ceiling = <1050000 1150000 1280000>;
-		qcom,cpr-voltage-floor = <1050000 1050000 1100000>;
+// [All][Main][Stability][DMS05406637][46540][akenhsu] bump up APC power rail for stability concern 20141130 BEGIN
+//		qcom,cpr-voltage-floor = <1050000 1050000 1100000>;
+		qcom,cpr-voltage-floor = <1050000 1075000 1125000>;		
+// [All][Main][Stability][DMS05406637][46540][akenhsu] 20141130 END
 		vdd-apc-supply = <&pm8226_s2>;
 
 		vdd-mx-supply = <&pm8226_l3_ao>;

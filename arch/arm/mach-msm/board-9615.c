@@ -824,6 +824,11 @@ static struct msm_otg_platform_data msm_otg_pdata = {
 	.enable_lpm_on_dev_suspend	= true,
 	.core_clk_always_on_workaround = true,
 	.delay_lpm_on_disconnect = true,
+// [All][Main][Stability][DMS06176102][47114][akenhsu] Add QCT Patch of USB in case#01889416 20150130 BEGIN
+// https://www.codeaurora.org/cgit/quic/la/kernel/msm-3.10/patch/drivers/usb/gadget/ci13xxx_udc.h?id=6a70ad8cfe09e62352e9b78e7bfd7b160fce775f
+// *** QCT said this midification can be ignored. ***
+	.rw_during_lpm_workaround = true,
+// [All][Main][Stability][DMS06176102][47114][akenhsu] 20150130 END
 };
 
 
