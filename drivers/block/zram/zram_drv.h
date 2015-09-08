@@ -76,7 +76,6 @@ struct zram_stats {
 };
 
 struct zram_meta {
-	rwlock_t tb_lock;	/* protect table */
 	void *compress_workmem;
 	void *compress_buffer;
 	struct table *table;
@@ -90,7 +89,7 @@ struct zram_slot_free {
 
 struct zram {
 	struct zram_meta *meta;
-	struct rw_semaphore lock; /* protect compression buffers,
+	struct rw_semaphore lock; /* protect compression buffers, table,
 				   * reads and writes
 				   */
 
