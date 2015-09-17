@@ -1,2 +1,2 @@
-ccflags-y := -O3 -mcpu=cortex-a7 -mtune=cortex-a7 -marm -mfpu=neon-vfpv4 -mvectorize-with-neon-quad -munaligned-access
+ccflags-y := -Ofast -fgcse-las -fpredictive-commoning -ffast-math -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mcpu=cortex-a7 -mtune=cortex-a7 -marm -mfpu=neon-vfpv4 -mvectorize-with-neon-quad -munaligned-access -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
 obj-y += msm_ion.o ion_cp_common.o ion_iommu_map.o
