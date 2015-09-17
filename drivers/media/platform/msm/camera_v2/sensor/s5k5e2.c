@@ -18,10 +18,8 @@ DEFINE_MSM_MUTEX(s5k5e2_mut);
 static ssize_t s5k5e2_read_version_attr(struct device *dev,struct device_attribute *attr, char *buf);
 static DEVICE_ATTR(read_version, 0664, s5k5e2_read_version_attr, NULL);
 //[all][Main][Camera][42153][01Begin] add driver attribute to read firmware version 
-//[all][Main][Camera][42153][02Begin] add driver attribute to read camera vendor
 static ssize_t s5k5e2_read_vendor_attr(struct device *dev,struct device_attribute *attr, char *buf);
 static DEVICE_ATTR(read_vendor, 0664, s5k5e2_read_vendor_attr, NULL);
-//[all][Main][Camera][42153][02End] add driver attribute to read camera vendor
 static struct msm_sensor_ctrl_t s5k5e2_s_ctrl;
 
 static struct msm_sensor_power_setting s5k5e2_power_setting[] = {
@@ -171,13 +169,11 @@ static int32_t s5k5e2_platform_probe(struct platform_device *pdev)
 	ret = device_create_file(&(pdev->dev), &dev_attr_read_version);
 	if (0 != ret)
 		pr_err("%s:%d creating attribute failed \n", __func__,__LINE__);
-//[all][Main][Camera][42153][02Begin] add driver attribute to read firmware version 
 
-//[all][Main][Camera][42153][03Begin] add driver attribute to read camera vendor
+//[all][Main][Camera][42153][02Begin] add driver attribute to read firmware version 
 	ret = device_create_file(&(pdev->dev), &dev_attr_read_vendor);
 	if (0 != ret)
 		pr_err("%s:%d creating attribute failed \n", __func__,__LINE__);
-//[all][Main][Camera][42153][03End] add driver attribute to read camera vendor
 	return rc;
 }
 
@@ -253,8 +249,6 @@ static ssize_t s5k5e2_read_version_attr(struct device *dev,struct device_attribu
 	 return sprintf(buf, "%x\n", version);
 }
 //[all][Main][Camera][42153][03Begin] add driver attribute to read firmware version 
-
-//[all][Main][Camera][42153][01Begin] add driver attribute to read camera vendor
 #if 1
 static struct msm_camera_i2c_reg_conf s5k5e2_read_eeprom[] = {
 	{0x0A00 ,0x04},
@@ -351,4 +345,3 @@ static ssize_t s5k5e2_read_vendor_attr(struct device *dev,struct device_attribut
 
 	 return sprintf(buf, "%x\n", version);
 }
-//[all][Main][Camera][42153][01End] add driver attribute to read camera vendor
