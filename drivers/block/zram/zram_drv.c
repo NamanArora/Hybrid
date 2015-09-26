@@ -29,41 +29,11 @@
 #include <linux/genhd.h>
 #include <linux/highmem.h>
 #include <linux/slab.h>
-#include <linux/lz4.h>
 #include <linux/string.h>
 #include <linux/vmalloc.h>
 #include <linux/ratelimit.h>
 
 #include "zram_drv.h"
-
-static inline int z_decompress_safe(const unsigned char *src, size_t src_len,
-			unsigned char *dest, size_t *dest_len)
-{
-#ifdef CONFIG_ZRAM_LZ4_COMPRESS
-	return lz4_decompress_unknownoutputsize(src, src_len, dest, dest_len);
-#else
-	return lzo1x_decompress_safe(src, src_len, dest, dest_len);
-#endif
-}
-
-static inline int z_compress(const unsigned char *src, size_t src_len,
-			unsigned char *dst, size_t *dst_len, void *wrkmem)
-{
-#ifdef CONFIG_ZRAM_LZ4_COMPRESS
-	return lz4_compress(src, src_len, dst, dst_len, wrkmem);
-#else
-	return lzo1x_1_compress(src, src_len, dst, dst_len, wrkmem);
-#endif
-}
-
-static inline size_t z_scratch_size(void)
-{
-#ifdef CONFIG_ZRAM_LZ4_COMPRESS
-	return LZ4_MEM_COMPRESS;
-#else
-	return LZO1X_MEM_COMPRESS;
-#endif
-}
 
 /* Globals */
 static int zram_major;
@@ -672,23 +642,34 @@ static ssize_t reset_store(struct device *dev,
 	zram = dev_to_zram(dev);
 	bdev = bdget_disk(zram->disk, 0);
 
+	if (!bdev)
+		return -ENOMEM;
+
 	/* Do not reset an active device! */
-	if (bdev->bd_holders)
-		return -EBUSY;
+	if (bdev->bd_holders) {
+		ret = -EBUSY;
+		goto out;
+	}
 
 	ret = kstrtou16(buf, 10, &do_reset);
 	if (ret)
-		return ret;
+		goto out;
 
-	if (!do_reset)
-		return -EINVAL;
+	if (!do_reset) {
+		ret = -EINVAL;
+		goto out;
+	}
 
 	/* Make sure all pending I/O is finished */
-	if (bdev)
-		fsync_bdev(bdev);
+	fsync_bdev(bdev);
+	bdput(bdev);
 
 	zram_reset_device(zram, true);
 	return len;
+
+out:
+	bdput(bdev);
+	return ret;
 }
 
 static void __zram_make_request(struct zram *zram, struct bio *bio)
@@ -982,4 +963,3 @@ MODULE_PARM_DESC(num_devices, "Number of zram devices");
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("Nitin Gupta <ngupta@vflare.org>");
 MODULE_DESCRIPTION("Compressed RAM Block Device");
-MODULE_ALIAS("devname:zram");
