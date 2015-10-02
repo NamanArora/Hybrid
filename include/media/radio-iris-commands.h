@@ -3,14 +3,11 @@
 
 //<2014/2/7-A000000033599-williamhu,[F[All][Main][App][] FP17909 FM Radio solution]  _begin
 #ifdef __KERNEL__
-//>2014/2/7-A000000033599-williamhu  _end
 #include <linux/skbuff.h>
 #include <linux/interrupt.h>
 #include <linux/mutex.h>
 #include <linux/atomic.h>
-//<2014/2/7-A000000033599-williamhu,[F[All][Main][App][] FP17909 FM Radio solution]  _begin
 #endif
-//>2014/2/7-A000000033599-williamhu  _end
 
 enum v4l2_cid_private_iris_t {
 	V4L2_CID_PRIVATE_IRIS_SRCHMODE = (0x08000000 + 1),

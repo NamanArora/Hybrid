@@ -139,9 +139,7 @@ static long media_device_enum_links(struct media_device *mdev,
 		unsigned int p;
 
 		for (p = 0; p < entity->num_pads; p++) {
-			//<2014/05/28 EricLin, Security Incident.
 			struct media_pad_desc pad = {0};
-			//>2014/05/28 EricLin
 			media_device_kpad_to_upad(&entity->pads[p], &pad);
 			if (copy_to_user(&links.pads[p], &pad, sizeof(pad)))
 				return -EFAULT;
