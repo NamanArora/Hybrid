@@ -1194,11 +1194,11 @@
 		compatible = "qcom,msm-thermal";
 		qcom,sensor-id = <0>;
 		qcom,poll-ms = <250>;
-		qcom,limit-temp = <73>;
+		qcom,limit-temp = <60>;
 		qcom,temp-hysteresis = <10>;
 		qcom,freq-step = <2>;
 		qcom,freq-control-mask = <0xf>;
-		qcom,core-limit-temp = <77>;
+		qcom,core-limit-temp = <70>;
 		qcom,core-temp-hysteresis = <10>;
 		qcom,core-control-mask = <0xe>;
 		qcom,hotplug-temp = <110>;
